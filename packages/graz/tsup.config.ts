@@ -86,6 +86,32 @@ export default defineConfig(({ watch }) => [
     onSuccess: watch ? undefined : "echo '✓ Main bundle built successfully'",
   },
 
+  // Test utilities bundle (graz/test)
+  {
+    ...defaultOptions,
+
+    dts: {
+      resolve: false,
+    },
+
+    entry: ["src/test/index.ts"],
+
+    external: [
+      /^@cosmjs\/.*/,
+      /^@keplr-wallet\/.*/,
+    ],
+
+    outDir: "dist/test",
+
+    minify: false,
+
+    outExtension: ({ format }) => ({
+      js: format === "esm" ? ".mjs" : ".js",
+    }),
+
+    onSuccess: "echo '✓ Test utilities built successfully'",
+  },
+
   // CLI bundle
   {
     ...defaultOptions,
