@@ -2,32 +2,37 @@
  * Unit tests for createMultiChainAsyncFunction (async operations)
  */
 
-import type { ChainInfo } from "@keplr-wallet/types";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createMultiChainAsyncFunction } from "../multi-chain";
 
-// TODO: Re-enable when Vitest 2.x __vite_ssr_exportName__ bug with @keplr-wallet/types is fixed
-describe.skip("createMultiChainAsyncFunction", () => {
-  const mockChains: ChainInfo[] = [
+interface MockChainInfo {
+  chainId: string;
+  chainName: string;
+  rpc: string;
+  rest: string;
+}
+
+describe("createMultiChainAsyncFunction", () => {
+  const mockChains: MockChainInfo[] = [
     {
       chainId: "cosmoshub-4",
       chainName: "Cosmos Hub",
       rpc: "https://rpc.cosmos.network",
       rest: "https://api.cosmos.network",
-    } as ChainInfo,
+    },
     {
       chainId: "osmosis-1",
       chainName: "Osmosis",
       rpc: "https://rpc.osmosis.zone",
       rest: "https://api.osmosis.zone",
-    } as ChainInfo,
+    },
     {
       chainId: "juno-1",
       chainName: "Juno",
       rpc: "https://rpc.juno.network",
       rest: "https://api.juno.network",
-    } as ChainInfo,
+    },
   ];
 
   beforeEach(() => {
@@ -59,7 +64,7 @@ describe.skip("createMultiChainAsyncFunction", () => {
   });
 
   it("should execute async function for each chain", async () => {
-    const fn = vi.fn(async (chain: ChainInfo) => {
+    const fn = vi.fn(async (chain: MockChainInfo) => {
       return Promise.resolve(chain.chainId.toUpperCase());
     });
 
@@ -97,13 +102,13 @@ describe.skip("createMultiChainAsyncFunction", () => {
   });
 
   it("should handle empty array", async () => {
-    const result = await createMultiChainAsyncFunction([], async (chain) => chain.chainName);
+    const result = await createMultiChainAsyncFunction([] as MockChainInfo[], async (chain) => chain.chainName);
 
     expect(result).toEqual({});
   });
 
   it("should handle errors in async functions", async () => {
-    const fn = async (chain: ChainInfo) => {
+    const fn = async (chain: MockChainInfo) => {
       if (chain.chainId === "osmosis-1") {
         throw new Error("Test error");
       }

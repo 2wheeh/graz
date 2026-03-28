@@ -2,32 +2,37 @@
  * Unit tests for createMultiChainFunction (sync operations)
  */
 
-import type { ChainInfo } from "@keplr-wallet/types";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createMultiChainFunction } from "../multi-chain";
+import { createMultiChainFunction } from "../multi-chain-core";
 
-// TODO: Re-enable when Vitest 2.x __vite_ssr_exportName__ bug with @keplr-wallet/types is fixed
-describe.skip("createMultiChainFunction", () => {
-  const mockChains: ChainInfo[] = [
+interface MockChainInfo {
+  chainId: string;
+  chainName: string;
+  rpc: string;
+  rest: string;
+}
+
+describe("createMultiChainFunction", () => {
+  const mockChains: MockChainInfo[] = [
     {
       chainId: "cosmoshub-4",
       chainName: "Cosmos Hub",
       rpc: "https://rpc.cosmos.network",
       rest: "https://api.cosmos.network",
-    } as ChainInfo,
+    },
     {
       chainId: "osmosis-1",
       chainName: "Osmosis",
       rpc: "https://rpc.osmosis.zone",
       rest: "https://api.osmosis.zone",
-    } as ChainInfo,
+    },
     {
       chainId: "juno-1",
       chainName: "Juno",
       rpc: "https://rpc.juno.network",
       rest: "https://api.juno.network",
-    } as ChainInfo,
+    },
   ];
 
   beforeEach(() => {
@@ -59,12 +64,11 @@ describe.skip("createMultiChainFunction", () => {
   });
 
   it("should execute function for each chain", () => {
-    const fn = vi.fn((chain: ChainInfo) => chain.chainId.toUpperCase());
+    const fn = vi.fn((chain: MockChainInfo) => chain.chainId.toUpperCase());
 
     const result = createMultiChainFunction(mockChains, fn);
 
     expect(fn).toHaveBeenCalledTimes(3);
-    // Note: Array.map passes (element, index, array) to the callback
     expect(fn).toHaveBeenNthCalledWith(1, mockChains[0], 0, mockChains);
     expect(fn).toHaveBeenNthCalledWith(2, mockChains[1], 1, mockChains);
     expect(fn).toHaveBeenNthCalledWith(3, mockChains[2], 2, mockChains);
@@ -76,7 +80,7 @@ describe.skip("createMultiChainFunction", () => {
   });
 
   it("should handle empty array", () => {
-    const result = createMultiChainFunction([], (chain) => chain.chainName);
+    const result = createMultiChainFunction([] as MockChainInfo[], (chain) => chain.chainName);
 
     expect(result).toEqual({});
   });
@@ -94,7 +98,7 @@ describe.skip("createMultiChainFunction", () => {
 
   it("should handle different return types", () => {
     const numberResult = createMultiChainFunction(mockChains, (chain) => chain.chainId.length);
-    expect(numberResult["cosmoshub-4"]).toBe(11); // "cosmoshub-4" has 11 characters
+    expect(numberResult["cosmoshub-4"]).toBe(11);
     expect(typeof numberResult["cosmoshub-4"]).toBe("number");
 
     const boolResult = createMultiChainFunction(mockChains, (chain) => chain.chainId.startsWith("cosmos"));

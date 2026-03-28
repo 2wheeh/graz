@@ -87,7 +87,7 @@ export const configureGraz = (args: ConfigureGrazArgs): ConfigureGrazArgs => {
         : prev.loggerConfig,
       _notFoundFn: args.onNotFound || prev._notFoundFn,
       _onReconnectFailed: args.onReconnectFailed || prev._onReconnectFailed,
-      _reconnect: args.autoReconnect === undefined ? true : args.autoReconnect || prev._reconnect,
+      _reconnect: args.autoReconnect === undefined ? prev._reconnect : args.autoReconnect,
     };
   });
   return args;

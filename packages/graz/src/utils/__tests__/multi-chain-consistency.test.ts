@@ -2,32 +2,37 @@
  * Tests for Record format consistency between sync and async multi-chain functions
  */
 
-import type { ChainInfo } from "@keplr-wallet/types";
 import { describe, expect, it } from "vitest";
 
 import { createMultiChainAsyncFunction, createMultiChainFunction } from "../multi-chain";
 
-// TODO: Re-enable when Vitest 2.x __vite_ssr_exportName__ bug with @keplr-wallet/types is fixed
-describe.skip("Multi-Chain Record Format Consistency", () => {
-  const mockChains: ChainInfo[] = [
+interface MockChainInfo {
+  chainId: string;
+  chainName: string;
+  rpc: string;
+  rest: string;
+}
+
+describe("Multi-Chain Record Format Consistency", () => {
+  const mockChains: MockChainInfo[] = [
     {
       chainId: "cosmoshub-4",
       chainName: "Cosmos Hub",
       rpc: "https://rpc.cosmos.network",
       rest: "https://api.cosmos.network",
-    } as ChainInfo,
+    },
     {
       chainId: "osmosis-1",
       chainName: "Osmosis",
       rpc: "https://rpc.osmosis.zone",
       rest: "https://api.osmosis.zone",
-    } as ChainInfo,
+    },
     {
       chainId: "juno-1",
       chainName: "Juno",
       rpc: "https://rpc.juno.network",
       rest: "https://api.juno.network",
-    } as ChainInfo,
+    },
   ];
 
   it("should return consistent Record format regardless of chain count", async () => {
@@ -78,8 +83,8 @@ describe.skip("Multi-Chain Record Format Consistency", () => {
   });
 
   it("should handle empty arrays consistently", async () => {
-    const syncEmpty = createMultiChainFunction([], (chain) => chain.chainName);
-    const asyncEmpty = await createMultiChainAsyncFunction([], async (chain) => chain.chainName);
+    const syncEmpty = createMultiChainFunction([] as MockChainInfo[], (chain) => chain.chainName);
+    const asyncEmpty = await createMultiChainAsyncFunction([] as MockChainInfo[], async (chain) => chain.chainName);
 
     expect(syncEmpty).toEqual({});
     expect(asyncEmpty).toEqual({});
